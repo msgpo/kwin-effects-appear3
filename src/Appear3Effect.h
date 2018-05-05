@@ -18,6 +18,9 @@
 #ifndef EFFECTS_APPEAR3_H
 #define EFFECTS_APPEAR3_H
 
+// own
+#include "Timeline.h"
+
 // kwineffects
 #include <kwineffects.h>
 
@@ -52,7 +55,7 @@ private:
 
 private:
     QSet<QString> m_blacklist;
-    QHash<const KWin::EffectWindow*, QTimeLine*> m_animations;
+    QHash<const KWin::EffectWindow*, Timeline> m_animations;
     int m_duration;
     qreal m_opacity;
     qreal m_distance;

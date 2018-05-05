@@ -56,10 +56,9 @@ void Appear3Effect::prePaintScreen(KWin::ScreenPrePaintData& data, int time)
 {
     auto it = m_animations.begin();
     while (it != m_animations.end()) {
-        QTimeLine* t = *it;
-        t->setCurrentTime(t->currentTime() + time);
-        if (t->currentTime() >= m_duration) {
-            delete t;
+        Timeline& t = *it;
+        t.update(time);
+        if (t.done()) {
             it = m_animations.erase(it);
         } else {
             ++it;
@@ -86,7 +85,7 @@ void Appear3Effect::paintWindow(KWin::EffectWindow* w, int mask, QRegion region,
 {
     const auto it = m_animations.constFind(w);
     if (it != m_animations.cend()) {
-        const qreal t = (*it)->currentValue();
+        const qreal t = (*it).value();
 
         data.setZTranslation(interpolate(m_distance, 0, t));
         data.multiplyOpacity(interpolate(m_opacity, 1, t));
@@ -147,20 +146,12 @@ void Appear3Effect::start(KWin::EffectWindow* w)
     // Tell other effects(like fade, for example) to ignore this window.
     w->setData(KWin::WindowAddedGrabRole, QVariant::fromValue(static_cast<void*>(this)));
 
-    auto* t = new QTimeLine(m_duration, this);
-    t->setCurveShape(QTimeLine::EaseInCurve);
-    m_animations.insert(w, t);
+    Timeline& t = m_animations[w];
+    t.setDuration(m_duration);
+    t.setEasingCurve(QEasingCurve::InCurve);
 }
 
 void Appear3Effect::stop(KWin::EffectWindow* w)
 {
-    if (m_animations.isEmpty()) {
-        return;
-    }
-    auto it = m_animations.find(w);
-    if (it == m_animations.end()) {
-        return;
-    }
-    delete *it;
-    m_animations.erase(it);
+    m_animations.remove(w);
 }
