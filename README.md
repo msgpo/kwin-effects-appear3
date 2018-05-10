@@ -30,7 +30,7 @@ sudo apt install libkwin4-effect-appear3
 git clone https://github.com/zzag/kwin-effects-appear3.git
 cd kwin-effects-appear3
 mkdir build && cd build
-cmake ..
+cmake -DCMAKE_INSTALL_PREFIX=/usr ..
 make -jN
 sudo make install
 ```
