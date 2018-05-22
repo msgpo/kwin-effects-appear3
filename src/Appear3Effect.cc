@@ -20,19 +20,6 @@
 // KConfigSkeleton
 #include "appear3config.h"
 
-// Qt
-#include <QtMath>
-
-namespace {
-const qreal s_fov = qTan(qDegreesToRadians(30.0));
-
-inline qreal distanceToScale(qreal distance, qreal size)
-{
-    Q_ASSERT(size > 0);
-    return 1.0 - qMin(1.0, 2.0 * distance * s_fov / size);
-}
-}
-
 Appear3Effect::Appear3Effect()
 {
     initConfig<Appear3Config>();
@@ -62,7 +49,7 @@ void Appear3Effect::reconfigure(ReconfigureFlags flags)
             ? Appear3Config::duration()
             : 160);
     m_opacity = Appear3Config::opacity();
-    m_distance = Appear3Config::distance();
+    m_scale = Appear3Config::scale();
 }
 
 void Appear3Effect::prePaintScreen(KWin::ScreenPrePaintData& data, int time)
@@ -100,7 +87,7 @@ void Appear3Effect::paintWindow(KWin::EffectWindow* w, int mask, QRegion region,
     if (it != m_animations.cend()) {
         const qreal t = (*it).value();
 
-        const qreal scale = distanceToScale(interpolate(m_distance, 0, t), qMax(w->width(), w->height()));
+        const qreal scale = interpolate(m_scale, 1, t);
 
         data.setXScale(scale);
         data.setYScale(scale);
